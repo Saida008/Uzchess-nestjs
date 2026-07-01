@@ -1,0 +1,29 @@
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { ConflictException } from '@nestjs/common';
+import { ILike } from 'typeorm';
+
+import { Difficulty } from '../../../entities/difficulty.entity';
+import { CreateDifficultyCommand } from './create-difficulty.command';
+
+@CommandHandler(CreateDifficultyCommand)
+export class CreateDifficultyHandler
+  implements ICommandHandler<CreateDifficultyCommand>
+{
+  async execute(cmd: CreateDifficultyCommand) {
+    const exists = await Difficulty.existsBy({
+      title: ILike(cmd.title),
+    });
+
+    if (exists) {
+      throw new ConflictException('Difficulty already exists');
+    }
+
+    const difficulty = Difficulty.create({
+      title: cmd.title,
+    });
+
+    await Difficulty.save(difficulty);
+
+    return difficulty;
+  }
+}
