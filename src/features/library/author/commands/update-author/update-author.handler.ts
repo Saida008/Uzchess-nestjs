@@ -23,7 +23,7 @@ export class UpdateAuthorHandler
 
     if (command.fullName) {
       const exists = await Author.existsBy({
-        id: Not(author.id),
+        id: Not(author.id!),
         fullName: ILike(command.fullName),
       });
 

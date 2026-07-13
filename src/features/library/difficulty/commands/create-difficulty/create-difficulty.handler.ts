@@ -20,6 +20,7 @@ export class CreateDifficultyHandler
 
     const difficulty = Difficulty.create({
       title: cmd.title,
+      icon: cmd.icon,
     });
 
     await Difficulty.save(difficulty);

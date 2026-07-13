@@ -104,16 +104,16 @@ export class LanguageController {
   @Post('create')
   @ApiOperation({summary:'BU yerda summary yoziladi', description:"BU yerda esa uzunroq qilib description yoziladi"})
   async create(@Body() payload: LanguageCreateDto) {
-    const titleExists = await Language.existsBy({
-      title: ILike(payload.title),
-    });
+   const titleExists = await Language.existsBy({
+  title: ILike(payload.title!),
+});
 
-    if (titleExists) {
-      throw new ConflictException('Title already exists');
-    }
+  if (titleExists) {
+  throw new ConflictException('Title already exists');
+}
 
     const codeExists = await Language.existsBy({
-      code: ILike(payload.code),
+      code: ILike(payload.code!),
     });
 
     if (codeExists) {
@@ -143,7 +143,7 @@ export class LanguageController {
 
     if (payload.title) {
       const titleExists = await Language.existsBy({
-        id: Not(language.id),
+        id: Not(language.id!),
         title: ILike(payload.title),
       });
 

@@ -7,28 +7,35 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { CommandBus } from '@nestjs/cqrs';
-import { plainToInstance } from 'class-transformer';
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
+import { DeleteCategoryRequest } from '../category/commands/delete-category/delete-category.request';
 import { Category } from '../entities/category.entity';
-import { CategoryListDto } from '../dtos/category/category.list.dto';
 import { CategoryUpdateDto } from '../dtos/category/category.update.dto';
+
 import { CreateCategoryRequest } from '../category/commands/create-category/create-category.request';
+import { GetAllCategoriesRequest } from '../category/queries/get-all-categories/get-all-categories.request';
+import { GetAllCategoriesResponse } from '../category/queries/get-all-categories/get-all-categories.response';
+import { PaginatedResult, PaginatedResultDTO } from './language/paginated-result.dto';
+import { Role } from '@/features/auth/entities/role.entity';
 
 @Controller('category')
 @ApiBearerAuth()
+// @UseGuards(AuthGuard)
 export class CategoryController {
-  constructor(private readonly cmdBus: CommandBus) {}
+  constructor(
+    private readonly cmdBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Get('list')
-  async getAll() {
-    const categories = await Category.find();
-
-    return plainToInstance(CategoryListDto, categories, {
-      excludeExtraneousValues: true,
-    });
+  @ApiOkResponse({ type: PaginatedResultDTO(GetAllCategoriesResponse) })
+  async getAll(@Query() filters: GetAllCategoriesRequest) {
+    return await this.queryBus.execute(filters.toQuery());
   }
 
   @Post('create')
@@ -38,7 +45,15 @@ export class CategoryController {
 
   @Get(':id')
   async getOne(@Param('id', ParseIntPipe) id: number) {
-    return await Category.findOneBy({ id });
+    const category = await Category.findOneBy({ id });
+
+    if (!category) {
+      return {
+        message: 'Category topilmadi',
+      };
+    }
+
+    return category;
   }
 
   @Patch('update/:id')
@@ -48,21 +63,11 @@ export class CategoryController {
   ) {
     return await this.cmdBus.execute(payload.toCommand(id));
   }
-
   @Delete('delete/:id')
-  async delete(@Param('id', ParseIntPipe) id: number) {
-    const category = await Category.findOneBy({ id });
+async delete(@Param('id', ParseIntPipe) id: number) {
+  const payload = new DeleteCategoryRequest();
+  payload.id = id;
 
-    if (!category) {
-      return {
-        message: 'Category topilmadi',
-      };
-    }
-
-    await category.remove();
-
-    return {
-      message: "Category o'chirildi",
-    };
-  }
+  return await this.cmdBus.execute(payload.toCommand());
+}
 }

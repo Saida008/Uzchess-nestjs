@@ -5,4 +5,7 @@ import { Column, Entity } from 'typeorm';
 export class Difficulty extends BaseModel {
   @Column({ length: 64, unique: true })
   title: string;
+
+  @Column({ length: 256 })
+  icon: string;
 }

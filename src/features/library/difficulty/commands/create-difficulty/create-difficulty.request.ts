@@ -1,14 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MaxLength } from 'class-validator';
+import { IsString, MaxLength, Allow } from 'class-validator';
 import { CreateDifficultyCommand } from './create-difficulty.command';
 
 export class CreateDifficultyRequest {
-  @ApiProperty()
   @IsString()
-  @MaxLength(64)
+  @MaxLength(32)
+  @ApiProperty()
   title: string;
 
-  toCommand() {
-    return new CreateDifficultyCommand(this.title);
+  @Allow()
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: true,
+  })
+  icon?: Express.Multer.File;
+
+  toCommand(icon: string) {
+    return new CreateDifficultyCommand(
+      this.title,
+      icon,
+    );
   }
 }

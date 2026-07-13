@@ -10,11 +10,11 @@
 //   ],
 // })
 // export class AppModule {}
-import { Entity, Column } from 'typeorm';
 import { BaseModel } from '@core/configs/base.model';
+import { Column, Entity } from 'typeorm';
 
 @Entity('categories')
 export class Category extends BaseModel {
   @Column({ length: 64, unique: true })
-  title?: string;
+  title: string;
 }
