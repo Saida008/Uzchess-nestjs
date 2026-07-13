@@ -2,7 +2,7 @@ import { Body, Controller, Post } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 
 import { PermissionDecorator } from "@/core/decorators/permission.decorator";
-import { CreateTaskRequest } from "./requests/create-task.request";
+import { CreateTaskRequest } from "./command/create-task/create-task.request";
 import { CreateTaskCommand } from "./command/create-task/create-task.command";
 
 @Controller("tasks")

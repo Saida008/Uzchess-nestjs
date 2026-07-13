@@ -14,6 +14,7 @@ import { PermissionGuard } from './core/guards/permission.guard';
 import { CacheModule } from '@nestjs/cache-manager';
 import { NewsModule } from './features/news/news.module';
 import { CoursesModule } from './features/courses/courses.module';
+import { TaskModule } from './features/task/task.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CoursesModule } from './features/courses/courses.module';
     AuthModule,
     NewsModule,
     CoursesModule,
+    TaskModule,
   ],
   providers:[
     {provide:APP_GUARD, useClass:AuthGuard},
